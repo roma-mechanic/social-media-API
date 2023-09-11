@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "user",
     "user_profile",
-    "comments" "rest_framework",
+    "posts",
+    "rest_framework",
     "drf_spectacular",
     "debug_toolbar",
 ]

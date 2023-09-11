@@ -4,9 +4,14 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.serializers import UserSerializer
 
+"""register user"""
+
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
+
+
+"""Detail info by user"""
 
 
 class ManageUserView(generics.RetrieveUpdateAPIView):

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from comments.models import Comments
-from comments.serializers import CommentSerializer
+from posts.models import Comments
+from posts.serializers import CommentSerializer
 from permissions import IsAdminOrIfAuthenticatedReadOnly
 
 
