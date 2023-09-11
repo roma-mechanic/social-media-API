@@ -24,7 +24,7 @@ class PostSerializer(serializers.ModelSerializer):
     summarises the comments and author models.
     """
 
-    author = serializers.ReadOnlyField(source="author.username")
+    # author = serializers.CharField(source="author")
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )
@@ -33,11 +33,12 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             "id",
-            "text",
+            "title",
+            "content",
             "author",
-            "likes",
+            "image",
             "comments",
             "date_created",
             "edited",
         ]
-        read_only_fields = ["uuid", "author", "date_created", "pins", "edited"]
+        read_only_fields = ["id", "author", "date_created", "likes", "edited"]

@@ -27,6 +27,9 @@ class Post(models.Model):
     likes = models.IntegerField(default=0, null=False)
     edited = models.BooleanField(default=False, null=False)
 
+    class Meta:
+        ordering = ["-date_created"]
+
     def __str__(self):
         return f"Post id = {self.id}, author = {self.author}"
 
