@@ -9,12 +9,13 @@ from posts.views import (
 )
 
 router = routers.DefaultRouter()
+posts_router = routers.NestedSimpleRouter(router, r"posts", lookup="post")
+posts_router.register(r"comments", CommentsViewSet, basename="post-comments")
+
 router.register("", PostsViewSet)
-# router.register("/<int:id>/comments/", CommentsViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
-    # path("post-list/", PostListCreateAPIView.as_view(), name="posts_list"),
     path(
         "<int:post_id>/comments/",
         CommentsViewSet.as_view(
