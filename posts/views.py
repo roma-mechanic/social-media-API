@@ -1,6 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    ListAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 
 from permissions import IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly
@@ -8,48 +12,75 @@ from posts.models import Comments, Post
 from posts.serializers import CommentSerializer, PostSerializer
 
 
-class PostListCreateAPIView(ListCreateAPIView):
-    """
-    Lists the currently logged in users posts with a GET and allows a user to
-    create a new post with POST. Must be logged in to access this route.
-
-    EXAMPLE:
-        GET -> /posts/ -> return a list of posts
-        POST -> /posts/ -> create new post
-    """
+class PostsViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.prefetch_related("author")
     serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    @staticmethod
+    def _params_to_ints(qs):
+        """Converts a list of string IDs to a list of integers"""
+        return [int(str_id) for str_id in qs.split(",")]
 
     def get_queryset(self):
-        """
-        Return all posts for logged in user.
-        """
-        return Post.objects.filter(author=self.request.user)
+        queryset = self.queryset
+        title = self.request.query_params.get("title")
+        author = self.request.query_params.get("author")
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        if author:
+            author_id = self._params_to_ints(author)
+            queryset = queryset.filter(author__id__in=author_id)
+        return queryset.distinct()
 
     def perform_create(self, serializer):
-        return serializer.save(author=self.request.user)
+        serializer.save(author=self.request.user)
 
 
-class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
-    """
-    Selects post by ID and displays it's details. Anon users able to read post
-    details with GET. Must be authenticated and be the owner of the post to make
-    PUT and DELETE requests.
-
-    EXAMPLE:
-        GET -> /posts/<id>/ -> return post details
-        PUT -> /posts/<id>/ -> make an edit to the post text (if owner)
-        DELETE -> /posts/<id>/ -> delete post (if owner)
-    """
-    queryset = Post.objects.prefetch_related("author")
-    lookup_field = 'id'
-
-    serializer_class = PostSerializer
-    permission_classes = [IsAuthorOrReadOnly]
-
-    def perform_update(self, serializer):
-        return serializer.save(edited=True)
+# class PostListCreateAPIView(ListCreateAPIView):
+#     """
+#     Lists the currently logged in users posts with a GET and allows a user to
+#     create a new post with POST. Must be logged in to access this route.
+#
+#     EXAMPLE:
+#         GET -> /posts/ -> return a list of posts
+#         POST -> /posts/ -> create new post
+#     """
+#
+#     queryset = Post.objects.prefetch_related("author")
+#     serializer_class = PostSerializer
+#     permission_classes = [IsAuthenticated]
+#
+#     def get_queryset(self):
+#         """
+#         Return all posts for logged in user.
+#         """
+#         return Post.objects.filter(author=self.request.user)
+#
+#     def perform_create(self, serializer):
+#         return serializer.save(author=self.request.user)
+#
+#
+# class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
+#     """
+#     Selects post by ID and displays it's details. Anon users able to read post
+#     details with GET. Must be authenticated and be the owner of the post to make
+#     PUT and DELETE requests.
+#
+#     EXAMPLE:
+#         GET -> /posts/<id>/ -> return post details
+#         PUT -> /posts/<id>/ -> make an edit to the post text (if owner)
+#         DELETE -> /posts/<id>/ -> delete post (if owner)
+#     """
+#
+#     queryset = Post.objects.prefetch_related("author")
+#     lookup_field = "id"
+#
+#     serializer_class = PostSerializer
+#     permission_classes = [IsAuthorOrReadOnly]
+#
+#     def perform_update(self, serializer):
+#         return serializer.save(edited=True)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
@@ -94,9 +125,9 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
 
 class UserPostListAPIView(ListAPIView):
-    """
-    """
+    """ """
+
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(author__id=self.kwargs['id'])
+        return Post.objects.filter(author__id=self.kwargs["id"])
