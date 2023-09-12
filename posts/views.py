@@ -98,10 +98,10 @@ class CommentsViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly)
 
     def get_queryset(self):
-        return Comments.objects.filter(post__id=self.kwargs["id"])
+        return Comments.objects.filter(post__id=self.kwargs["post_id"])
 
     def perform_create(self, serializer):
-        post = Post.objects.get(id=self.kwargs["id"])
+        post = Post.objects.get(id=self.kwargs["post_id"])
         return serializer.save(author=self.request.user, post=post)
 
     """

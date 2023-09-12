@@ -10,12 +10,21 @@ from posts.views import (
 
 router = routers.DefaultRouter()
 router.register("", PostsViewSet)
-router.register("comments/", CommentsViewSet)
+# router.register("/<int:id>/comments/", CommentsViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
     # path("post-list/", PostListCreateAPIView.as_view(), name="posts_list"),
-    # path("post/<int:pk>/", PostDetailAPIView.as_view(), name="post_detail"),
+    path(
+        "<int:post_id>/comments/",
+        CommentsViewSet.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+        name="comments",
+    ),
 ]
 
 app_name = "posts"
