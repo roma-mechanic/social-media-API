@@ -1,31 +1,22 @@
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework_nested import routers
 
 from posts.views import (
     CommentsViewSet,
     PostsViewSet,
-    # PostListCreateAPIView,
-    # PostDetailAPIView,
 )
 
-router = routers.DefaultRouter()
-posts_router = routers.NestedSimpleRouter(router, r"posts", lookup="post")
-posts_router.register(r"comments", CommentsViewSet, basename="post-comments")
+router = routers.SimpleRouter()
+router.register(r"posts", PostsViewSet)
 
-router.register("", PostsViewSet)
+comments_router = routers.NestedSimpleRouter(router, r"posts", lookup="post")
+comments_router.register(
+    r"comments", CommentsViewSet, basename="post-comments"
+)
 
 urlpatterns = [
     path("", include(router.urls)),
-    path(
-        "<int:post_id>/comments/",
-        CommentsViewSet.as_view(
-            {
-                "get": "list",
-                "post": "create",
-            }
-        ),
-        name="comments",
-    ),
+    path("", include(comments_router.urls)),
 ]
 
 app_name = "posts"
