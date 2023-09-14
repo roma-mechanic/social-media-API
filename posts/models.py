@@ -1,10 +1,26 @@
 import os
 import uuid
 
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey,
+    GenericRelation,
+)
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.text import slugify
 
 from social_media_api import settings
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="likes",
+        on_delete=models.CASCADE,
+    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
 
 
 def movie_image_file_path(instance, filename):
@@ -24,7 +40,7 @@ class Post(models.Model):
     content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, upload_to=movie_image_file_path)
-    likes = models.IntegerField(default=0, null=False)
+    likes = GenericRelation(Like)
     edited = models.BooleanField(default=False, null=False)
 
     class Meta:
@@ -32,6 +48,10 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post id = {self.id}, author = {self.author}"
+
+    @property
+    def total_likes(self):
+        return self.likes.count()
 
     def get_comments_count(self):
         return self.comments.all().count()
