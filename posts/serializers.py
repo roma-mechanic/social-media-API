@@ -28,7 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     summarises the comments and author models.
     """
 
-    author = serializers.CharField(source="author")
+    # author = serializers.CharField(source="author")
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )

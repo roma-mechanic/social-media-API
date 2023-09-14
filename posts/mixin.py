@@ -27,7 +27,7 @@ class LikedMixin:
         services.remove_like(obj, request.user)
         return Response()
 
-    @action(methods=["GET"])
+    @action(detail=False,  methods=["GET"])
     def fans(self, request, pk=None):
         """
         Gets all users who liked `obj`

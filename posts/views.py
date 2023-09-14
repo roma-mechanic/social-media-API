@@ -1,11 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
     ListAPIView,
 )
-from rest_framework.permissions import IsAuthenticated
 
 from permissions import IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly
 from posts.mixin import LikedMixin
@@ -36,7 +33,6 @@ class PostsViewSet(LikedMixin, viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
