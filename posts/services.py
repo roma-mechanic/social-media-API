@@ -19,7 +19,7 @@ def add_like(obj, user):
 
 def remove_like(obj, user):
     """
-    Delete like from 'object'.
+    Remove like from 'object'.
     """
     obj_type = ContentType.objects.get_for_model(obj)
     Like.objects.filter(
@@ -29,7 +29,7 @@ def remove_like(obj, user):
 
 def is_fan(obj, user) -> bool:
     """
-    Checks if `user` has liked `obj`
+    Checks if `user` has liked `obj or not`
     """
     if not user.is_authenticated:
         return False

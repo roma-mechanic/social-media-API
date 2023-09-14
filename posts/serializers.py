@@ -1,8 +1,11 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from posts.models import Comments, Post
 from user.serializers import UserListSerializer
 from posts import services as likes_services
+
+User = get_user_model()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -59,3 +62,17 @@ class PostSerializer(serializers.ModelSerializer):
         """
         user = self.context.get("request").user
         return likes_services.is_fan(obj, user)
+
+
+class FanSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "full_name",
+        )
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()

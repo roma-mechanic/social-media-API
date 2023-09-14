@@ -8,11 +8,12 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 
 from permissions import IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly
+from posts.mixin import LikedMixin
 from posts.models import Comments, Post
 from posts.serializers import CommentSerializer, PostSerializer
 
 
-class PostsViewSet(viewsets.ModelViewSet):
+class PostsViewSet(LikedMixin, viewsets.ModelViewSet):
     queryset = Post.objects.prefetch_related("author")
     serializer_class = PostSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
@@ -36,51 +37,6 @@ class PostsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-
-# class PostListCreateAPIView(ListCreateAPIView):
-#     """
-#     Lists the currently logged in users posts with a GET and allows a user to
-#     create a new post with POST. Must be logged in to access this route.
-#
-#     EXAMPLE:
-#         GET -> /posts/ -> return a list of posts
-#         POST -> /posts/ -> create new post
-#     """
-#
-#     queryset = Post.objects.prefetch_related("author")
-#     serializer_class = PostSerializer
-#     permission_classes = [IsAuthenticated]
-#
-#     def get_queryset(self):
-#         """
-#         Return all posts for logged in user.
-#         """
-#         return Post.objects.filter(author=self.request.user)
-#
-#     def perform_create(self, serializer):
-#         return serializer.save(author=self.request.user)
-#
-#
-# class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
-#     """
-#     Selects post by ID and displays it's details. Anon users able to read post
-#     details with GET. Must be authenticated and be the owner of the post to make
-#     PUT and DELETE requests.
-#
-#     EXAMPLE:
-#         GET -> /posts/<id>/ -> return post details
-#         PUT -> /posts/<id>/ -> make an edit to the post text (if owner)
-#         DELETE -> /posts/<id>/ -> delete post (if owner)
-#     """
-#
-#     queryset = Post.objects.prefetch_related("author")
-#     lookup_field = "id"
-#
-#     serializer_class = PostSerializer
-#     permission_classes = [IsAuthorOrReadOnly]
-#
-#     def perform_update(self, serializer):
-#         return serializer.save(edited=True)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
