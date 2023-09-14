@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from posts.models import Comments, Post
 from user.serializers import UserListSerializer
+from posts import services as likes_services
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -24,10 +25,11 @@ class PostSerializer(serializers.ModelSerializer):
     summarises the comments and author models.
     """
 
-    # author = serializers.CharField(source="author")
+    author = serializers.CharField(source="author")
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )
+    is_fun = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -39,6 +41,21 @@ class PostSerializer(serializers.ModelSerializer):
             "image",
             "comments",
             "date_created",
+            "is_fun",
+            "total_likes",
             "edited",
         ]
-        read_only_fields = ["id", "author", "date_created", "likes", "edited"]
+        read_only_fields = [
+            "id",
+            "author",
+            "date_created",
+            "total_likes",
+            "edited",
+        ]
+
+    def get_is_fan(self, obj) -> bool:
+        """
+        Checks if `request.user` liked the post (`obj`).
+        """
+        user = self.context.get("request").user
+        return likes_services.is_fan(obj, user)
