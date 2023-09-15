@@ -32,7 +32,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )
-    is_fun = serializers.SerializerMethodField()
+    is_fan = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -44,7 +44,7 @@ class PostSerializer(serializers.ModelSerializer):
             "image",
             "comments",
             "date_created",
-            "is_fun",
+            "is_fan",
             "total_likes",
             "edited",
         ]

@@ -1,14 +1,11 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from posts import services
+from user.serializers import UserListSerializer
 from .serializers import FanSerializer
 
 
 class LikedMixin:
-
-    def get_object(self):
-        pass
-
     @action(detail=True, methods=["POST"])
     def like(self, request, pk=None):
         """
@@ -27,12 +24,12 @@ class LikedMixin:
         services.remove_like(obj, request.user)
         return Response()
 
-    @action(detail=False,  methods=["GET"])
+    @action(detail=False, methods=["GET"])
     def fans(self, request, pk=None):
         """
         Gets all users who liked `obj`
         """
         obj = self.get_object()
         fans = services.get_fans(obj)
-        serializer = FanSerializer(fans, many=True)
+        serializer = UserListSerializer(fans, many=True)
         return Response(serializer.data)

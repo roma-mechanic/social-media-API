@@ -10,7 +10,7 @@ from posts.models import Comments, Post
 from posts.serializers import CommentSerializer, PostSerializer
 
 
-class PostsViewSet(LikedMixin, viewsets.ModelViewSet):
+class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
     queryset = Post.objects.prefetch_related("author")
     serializer_class = PostSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
