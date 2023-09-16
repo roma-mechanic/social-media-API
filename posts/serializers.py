@@ -15,11 +15,27 @@ class CommentSerializer(serializers.ModelSerializer):
 
     author = UserListSerializer(read_only=True)
     post = serializers.SlugRelatedField(slug_field="id", read_only=True)
+    is_fan = serializers.SerializerMethodField()
 
     class Meta:
         model = Comments
-        fields = ["id", "content", "created_at", "post", "author"]
+        fields = [
+            "id",
+            "content",
+            "created_at",
+            "post",
+            "author",
+            "is_fan",
+            "total_likes",
+        ]
         read_only_fields = ["date_created", "id"]
+
+    def get_is_fan(self, obj) -> bool:
+        """
+        Checks if `request.user` liked the comments (`obj`).
+        """
+        user = self.context.get("request").user
+        return likes_services.is_fan(obj, user)
 
 
 class PostSerializer(serializers.ModelSerializer):

@@ -68,6 +68,11 @@ class Comments(models.Model):
     )
     content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+    likes = GenericRelation(Like)
 
     class Meta:
         ordering = ["-created_at"]
+
+    @property
+    def total_likes(self):
+        return self.likes.count()

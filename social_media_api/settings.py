@@ -37,12 +37,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "user",
     "user_profile",
     "posts",
     "rest_framework",
     "drf_spectacular",
-    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -145,3 +145,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
