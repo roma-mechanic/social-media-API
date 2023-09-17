@@ -72,7 +72,7 @@ class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
 
     queryset = Comments.objects.prefetch_related("author", "post")
     serializer_class = CommentSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         return Comments.objects.filter(post__id=self.kwargs["post_pk"])
@@ -85,7 +85,7 @@ class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
         comment = get_object_or_404(
             Comments,
             id=self.kwargs["pk"],
-            post__id=self.kwargs["post_pk"],
+            # post__id=self.kwargs["post_pk"],
         )
         self.check_object_permissions(self.request, comment)
         return comment

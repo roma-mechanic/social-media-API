@@ -7,7 +7,7 @@ from .serializers import FanSerializer
 
 class LikedMixin:
     @action(detail=True, methods=["POST"])
-    def like(self, request, pk=None):
+    def like(self, request, **kwargs):
         """
         liked `obj`.
         """
@@ -16,7 +16,7 @@ class LikedMixin:
         return Response()
 
     @action(detail=True, methods=["POST"])
-    def unlike(self, request, pk=None):
+    def unlike(self, request, **kwargs):
         """
         Removes like from `obj`.
         """
@@ -25,7 +25,7 @@ class LikedMixin:
         return Response()
 
     @action(detail=True, methods=["GET"])
-    def fans(self, request, pk=None):
+    def fans(self, request, **kwargs):
         """
         Gets all users who liked `obj`
         """
