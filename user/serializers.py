@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from user.models import User
+from user_profile.models import UserProfile
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ("id", "email", "password", "is_staff")
         read_only_fields = ("is_staff",)
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
@@ -25,6 +28,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(UserSerializer):
+    full_name = serializers.CharField(source="get_full_name")
+
     class Meta:
-        model = get_user_model()
-        fields = ("id", "email", "username")
+        model = User
+        fields = ("id", "email", "full_name")
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "password",
+            "is_staff",
+            "first_name",
+            "last_name",
+        )
+        read_only_fields = ("is_staff",)
+        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}

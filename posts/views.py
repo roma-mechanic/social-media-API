@@ -49,7 +49,7 @@ class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
         return queryset.distinct()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        return serializer.save(author=self.request.user)
 
 
 class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
@@ -85,7 +85,7 @@ class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
         comment = get_object_or_404(
             Comments,
             id=self.kwargs["pk"],
-            # post__id=self.kwargs["post_pk"],
+            post__id=self.kwargs["post_pk"],
         )
         self.check_object_permissions(self.request, comment)
         return comment

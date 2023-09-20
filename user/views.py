@@ -2,7 +2,11 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from user.serializers import UserSerializer
+from user.serializers import (
+    UserSerializer,
+    UserListSerializer,
+    UserDetailSerializer,
+)
 
 """register user"""
 
@@ -14,8 +18,8 @@ class CreateUserView(generics.CreateAPIView):
 """Detail info by user"""
 
 
-class ManageUserView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserDetailSerializer
     # authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 
