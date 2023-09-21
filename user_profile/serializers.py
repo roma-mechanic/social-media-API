@@ -2,23 +2,21 @@ from rest_framework import serializers
 
 from user.models import User
 from user_profile.models import UserProfile
-from user.serializers import (
-    UserListSerializer,
-    UserSerializer,
-    UserDetailSerializer,
-)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    # user = UserDetailSerializer(read_only=True)
-
     class Meta:
         model = UserProfile
-        fields = ("id", "user", "bio", "profile_image", "followers")
+        fields = (
+            "id",
+            "bio",
+            "username",
+            "profile_image",
+            "followers",
+        )
 
 
-class UserProfileListSerializer(serializers.ModelSerializer):
-    # user = UserDetailSerializer(read_only=True)
+class UserProfileDetailSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source="user.id", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
     first_name = serializers.CharField(
@@ -31,6 +29,7 @@ class UserProfileListSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "user_id",
+            "username",
             "email",
             "first_name",
             "last_name",
@@ -38,3 +37,25 @@ class UserProfileListSerializer(serializers.ModelSerializer):
             "profile_image",
             "followers",
         )
+
+
+class UserProfileListSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ("id", "user_id", "username", "profile_image", "followers")
+
+
+class FanSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "full_name",
+        )
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()

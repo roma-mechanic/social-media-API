@@ -9,9 +9,9 @@ from social_media_api import settings
 
 def movie_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.info)}-{uuid.uuid4()}{extension}"
+    filename = f"{slugify(instance.email)}-{uuid.uuid4()}{extension}"
 
-    return os.path.join("uploads/movies/", filename)
+    return os.path.join("uploads/user", filename)
 
 
 class UserProfile(models.Model):
@@ -19,6 +19,7 @@ class UserProfile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
     email = models.EmailField(max_length=100)
+    username = models.CharField(max_length=50)
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     bio = models.TextField(max_length=500, blank=True)

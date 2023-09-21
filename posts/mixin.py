@@ -1,8 +1,8 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from posts import services
 from user.serializers import UserListSerializer
-from .serializers import FanSerializer
 
 
 class LikedMixin:
