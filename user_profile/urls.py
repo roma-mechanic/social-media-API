@@ -1,5 +1,6 @@
 from django.urls import path
 
+from posts.views import UserPostListAPIView
 from user_profile.views import (
     UserProfileListView,
     UserProfileCreateView,
@@ -20,6 +21,7 @@ urlpatterns = [
         UserProfileUpdateDeleteView.as_view(),
         name="userprofile-update",
     ),
+    path("<int:pk>/posts/", UserPostListAPIView.as_view(), name="user-posts"),
 ]
 
 app_name = "user_profile"

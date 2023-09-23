@@ -62,14 +62,12 @@ class PostSerializer(serializers.ModelSerializer):
             "date_created",
             "is_fan",
             "total_likes",
-            "edited",
         ]
         read_only_fields = [
             "id",
             "author",
             "date_created",
             "total_likes",
-            "edited",
         ]
 
     def get_is_fan(self, obj) -> bool:

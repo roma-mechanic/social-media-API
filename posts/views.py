@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.generics import (
     ListAPIView,
 )
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from permissions import IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly
 from posts.mixin import LikedMixin
@@ -30,7 +31,7 @@ class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
 
     queryset = Post.objects.prefetch_related("author")
     serializer_class = PostSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -97,4 +98,4 @@ class UserPostListAPIView(ListAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(author__id=self.kwargs["id"])
+        return Post.objects.filter(author__id=self.kwargs["pk"])
