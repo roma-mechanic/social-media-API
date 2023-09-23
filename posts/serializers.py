@@ -48,6 +48,7 @@ class PostSerializer(serializers.ModelSerializer):
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )
+    author = serializers.CharField(source="author.email")
     is_fan = serializers.SerializerMethodField()
 
     class Meta:

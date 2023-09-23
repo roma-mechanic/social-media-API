@@ -1,11 +1,10 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import permissions
+from rest_framework import viewsets, generics
 from rest_framework.generics import (
     ListAPIView,
 )
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from permissions import IsAdminOrIfAuthenticatedReadOnly, IsAuthorOrReadOnly
+from permissions import IsAuthorOrReadOnly
 from posts.mixin import LikedMixin
 from posts.models import Comments, Post
 from posts.serializers import CommentSerializer, PostSerializer
@@ -31,7 +30,8 @@ class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
 
     queryset = Post.objects.prefetch_related("author")
     serializer_class = PostSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    # permission_classes = (IsAuthenticatedOrReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
@@ -53,27 +53,33 @@ class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
         return serializer.save(author=self.request.user)
 
 
-class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
+class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     """
     Lists all the comments for a given post. Anon users can read comments. Must
-    be logged in to create comments on the post.
+    be logged in to create comments on the post, add/remove like.
 
     EXAMPLE:
-        GET -> /posts/<id>/comments/ -> returns all comments for post with id
-        POST -> /posts/<id>/comments/ -> create new comment on post with id
+        GET -> /posts/<post_id>/comments/ -> returns all comments for post with id
+        GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
+        POST -> /posts/<post_id>/comment/create/ -> create new comment on post with id
+        POST -> /posts/<post_id>/comments/<comment_id>/like/ -> add like to this comment
+        POST -> /posts/<post_id>/comments/<comment_id>/unlike/ -> remove like from this comment
 
-     Allows user to delete their comment on a post. ID for the post and comment
-        required. Users can only delete their own comments. Also enable the retrieval
-        of a single comments details.
-
-        EXAMPLE:
-            GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
-            DELETE -> /posts/<post_id>/comments/<comment_id>/ -> delete comment
+        PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
     """
 
     queryset = Comments.objects.prefetch_related("author", "post")
     serializer_class = CommentSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    permission_classes = (permissions.AllowAny,)
+
+    def get_queryset(self):
+        return Comments.objects.filter(post__id=self.kwargs["post_pk"])
+
+
+class CommentCreateView(generics.CreateAPIView):
+    queryset = Comments.objects.prefetch_related("author", "post")
+    serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         return Comments.objects.filter(post__id=self.kwargs["post_pk"])
@@ -82,14 +88,30 @@ class CommentsViewSet(viewsets.ModelViewSet, LikedMixin):
         post = Post.objects.get(id=self.kwargs["post_pk"])
         return serializer.save(author=self.request.user, post=post)
 
-    def get_object(self):
-        comment = get_object_or_404(
-            Comments,
-            id=self.kwargs["pk"],
-            post__id=self.kwargs["post_pk"],
-        )
-        self.check_object_permissions(self.request, comment)
-        return comment
+
+class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    """
+     Allows user to delete, update their comment on a post. ID for the post and comment
+     required. Users can only delete their own comments. Also enable the retrieval
+     of a single comments details.
+
+    EXAMPLE:
+        GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
+        PUT, PATCH, DELETE -> /posts/<post_id>/comment/<comment_id>/update/ -> update, delete comment
+
+         PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
+    """
+
+    queryset = Comments.objects.prefetch_related("author", "post")
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthorOrReadOnly, permissions.IsAdminUser)
+
+    def get_queryset(self):
+        return Comments.objects.filter(post__id=self.kwargs["post_pk"])
+
+    def perform_create(self, serializer):
+        post = Post.objects.get(id=self.kwargs["post_pk"])
+        return serializer.save(author=self.request.user, post=post)
 
 
 class UserPostListAPIView(ListAPIView):
