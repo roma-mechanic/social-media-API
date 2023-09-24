@@ -44,11 +44,10 @@ class PostSerializer(serializers.ModelSerializer):
     summarises the comments and author models.
     """
 
-    # author = serializers.CharField(source="author.email")
     comments = serializers.IntegerField(
         source="get_comments_count", read_only=True
     )
-    author = serializers.CharField(source="author.email")
+    author = UserListSerializer(read_only=True)
     is_fan = serializers.SerializerMethodField()
 
     class Meta:

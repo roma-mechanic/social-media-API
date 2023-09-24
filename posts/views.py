@@ -10,44 +10,51 @@ from posts.models import Comments, Post
 from posts.serializers import CommentSerializer, PostSerializer
 
 
-class PostsViewSet(viewsets.ModelViewSet, LikedMixin):
+class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     """
-    Lists all the posts for a given user. Anon users can read post. Must
-    be logged in to create a post.
+    Lists all the posts . Anon users can read post.
 
     EXAMPLE:
         GET -> /posts/ -> returns all posts
-        POST -> /posts/-> create new post
+        GET -> /posts/{id}/ -> return the post detail
+    """
 
+    queryset = Post.objects.select_related("author")
+    serializer_class = PostSerializer
+    permission_classes = (permissions.AllowAny,)
+
+
+class PostCreateView(generics.CreateAPIView):
+    """
+    Create  new post. Must
+    be logged in to create a post.
+
+    EXAMPLE:
+        POST -> /post/create/-> create new post
+    """
+
+    queryset = Post.objects.select_related("author")
+    serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        return serializer.save(author=self.request.user)
+
+
+class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    """
     Allows user to delete their post. ID for the post required.
     Users can only delete their own posts. Also enable the retrieval
         of a single post details.
 
         GET -> /posts/<id>/ -> return the post detail with the post ID
-        PUT, PATCH, DELETE -> /posts/<id>/ -> put, patch, delete post with post ID
+        PUT, PATCH, DELETE -> /posts/<id>/update/ -> put, patch, delete post with post ID
 
     """
 
-    queryset = Post.objects.prefetch_related("author")
+    queryset = Post.objects.select_related("author")
     serializer_class = PostSerializer
-
-    # permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    @staticmethod
-    def _params_to_ints(qs):
-        """Converts a list of string IDs to a list of integers"""
-        return [int(str_id) for str_id in qs.split(",")]
-
-    def get_queryset(self):
-        queryset = self.queryset
-        title = self.request.query_params.get("title")
-        author = self.request.query_params.get("author")
-        if title:
-            queryset = queryset.filter(title__icontains=title)
-        if author:
-            author_id = self._params_to_ints(author)
-            queryset = queryset.filter(author__id__in=author_id)
-        return queryset.distinct()
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
@@ -97,7 +104,7 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
     EXAMPLE:
         GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
-        PUT, PATCH, DELETE -> /posts/<post_id>/comment/<comment_id>/update/ -> update, delete comment
+        PUT, PATCH, DELETE -> /posts/<post_id>/comments/<comment_id>/update/ -> update, delete comment
 
          PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
     """
