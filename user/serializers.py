@@ -1,10 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from django.utils.text import gettext_lazy as _
 
 from user.models import User
-from user_profile.models import UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):

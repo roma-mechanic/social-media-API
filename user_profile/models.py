@@ -16,7 +16,9 @@ def movie_image_file_path(instance, filename):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile",
     )
     email = models.EmailField(max_length=100)
     username = models.CharField(max_length=50)
@@ -27,5 +29,7 @@ class UserProfile(models.Model):
         upload_to=movie_image_file_path, blank=True
     )
     followers = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="user_followers", blank=True
+        settings.AUTH_USER_MODEL,
+        related_name="follower",
+        blank=True,
     )

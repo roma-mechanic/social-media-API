@@ -4,15 +4,14 @@ from user.models import User
 from user_profile.models import UserProfile
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = (
             "id",
-            "bio",
             "username",
+            "bio",
             "profile_image",
-            "followers",
         )
 
 
@@ -37,6 +36,7 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
             "profile_image",
             "followers",
         )
+        read_only_fields = ("followers",)
 
 
 class UserProfileListSerializer(serializers.ModelSerializer):

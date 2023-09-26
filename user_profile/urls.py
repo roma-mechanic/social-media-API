@@ -6,6 +6,8 @@ from user_profile.views import (
     UserProfileCreateView,
     UserProfileDetailView,
     UserProfileUpdateDeleteView,
+    add_follower,
+    remove_follower,
 )
 
 urlpatterns = [
@@ -22,6 +24,16 @@ urlpatterns = [
         name="userprofile-update",
     ),
     path("<int:pk>/posts/", UserPostListAPIView.as_view(), name="user-posts"),
+    path(
+        "<int:pk>/followers-add/",
+        add_follower,
+        name="follower-add",
+    ),
+    path(
+        "<int:pk>/followers-remove/",
+        remove_follower,
+        name="-follower-remove",
+    ),
 ]
 
 app_name = "user_profile"
