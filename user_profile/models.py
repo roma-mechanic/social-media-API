@@ -33,3 +33,12 @@ class UserProfile(models.Model):
         related_name="follower",
         blank=True,
     )
+    following = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="following", blank=True
+    )
+
+    # def count_followers(self):
+    #     return self.followers.count()
+
+    # def count_following(self):
+    #     return User.objects.filter(followers=self).count()

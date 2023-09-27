@@ -44,7 +44,14 @@ class UserProfileListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ("id", "user_id", "username", "profile_image", "followers")
+        fields = (
+            "id",
+            "user_id",
+            "username",
+            "profile_image",
+            "followers",
+            "following",
+        )
 
 
 class FanSerializer(serializers.ModelSerializer):

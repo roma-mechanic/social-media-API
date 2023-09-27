@@ -1,8 +1,6 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.views import View
 from rest_framework import generics
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 
 from user_profile.models import UserProfile
@@ -48,15 +46,21 @@ class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 @api_view(["POST"])
 def add_follower(request, pk, *args, **kwargs):
-    profile = UserProfile.objects.get(pk=pk)
-    print(request.data)
-    profile.followers.add(request.user)
-    return redirect("user_profile:userprofile-detail", pk=profile.pk)
+    current_profile = UserProfile.objects.get(user=request.user)
+    current_user = request.user
+    other_profile = UserProfile.objects.get(pk=pk)
+    other_user = other_profile.user
+    other_profile.followers.add(current_user)
+    current_profile.following.add(other_user)
+    return redirect("user_profile:userprofile-detail", pk=other_profile.pk)
 
 
 @api_view(["POST"])
 def remove_follower(request, pk, *args, **kwargs):
-    profile = UserProfile.objects.get(pk=pk)
-    print(request.data)
-    profile.followers.remove(request.user)
-    return redirect("user_profile:userprofile-detail", pk=profile.pk)
+    current_profile = UserProfile.objects.get(user=request.user)
+    current_user = request.user
+    other_profile = UserProfile.objects.get(pk=pk)
+    other_user = other_profile.user
+    other_profile.followers.remove(current_user)
+    current_profile.following.remove(other_user)
+    return redirect("user_profile:userprofile-detail", pk=other_profile.pk)
