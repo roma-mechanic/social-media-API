@@ -47,19 +47,3 @@ class UserDetailSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("is_staff",)
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
-
-
-# class RefreshTokenSerializer(serializers.Serializer):
-#     refresh = serializers.CharField()
-#
-#     default_error_messages = {"bad_token": _("Token is invalid or expired")}
-#
-#     def validate(self, attrs):
-#         self.token = attrs["refresh"]
-#         return attrs
-#
-#     def save(self, **kwargs):
-#         try:
-#             RefreshToken(self.token).blacklist()
-#         except TokenError:
-#             self.fail("bad_token")
