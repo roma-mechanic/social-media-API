@@ -13,13 +13,17 @@ from user_profile.serializers import (
 
 
 class UserProfileListView(generics.ListAPIView):
-    queryset = UserProfile.objects.prefetch_related("user", "followers")
+    queryset = UserProfile.objects.select_related("user").prefetch_related(
+        "followers", "following"
+    )
     serializer_class = UserProfileListSerializer
     permission_classes = [IsAuthenticated]
 
 
 class UserProfileCreateView(generics.CreateAPIView):
-    queryset = UserProfile.objects.prefetch_related("user", "followers")
+    queryset = UserProfile.objects.select_related("user").prefetch_related(
+        "followers", "following"
+    )
     serializer_class = UserProfileCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -28,13 +32,17 @@ class UserProfileCreateView(generics.CreateAPIView):
 
 
 class UserProfileDetailView(generics.RetrieveAPIView):
-    queryset = UserProfile.objects.prefetch_related("user", "followers")
+    queryset = UserProfile.objects.select_related("user").prefetch_related(
+        "followers", "following"
+    )
     serializer_class = UserProfileDetailSerializer
     permission_classes = [IsAuthenticated]
 
 
 class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserProfile.objects.prefetch_related("user", "followers")
+    queryset = UserProfile.objects.select_related("user").prefetch_related(
+        "followers", "following"
+    )
     serializer_class = UserProfileDetailSerializer
     permission_classes = [IsAuthenticated]
 

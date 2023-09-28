@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from user.models import User
-from user.serializers import UserListSerializer
 from user_profile.models import UserProfile
 
 
@@ -23,8 +22,12 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
         source="user.first_name", read_only=True
     )
     last_name = serializers.CharField(source="user.last_name", read_only=True)
-    followers = serializers.SlugRelatedField(slug_field="email", many=True, read_only=True)
-    following = serializers.SlugRelatedField(slug_field="email", many=True, read_only=True)
+    followers = serializers.SlugRelatedField(
+        slug_field="email", many=True, read_only=True
+    )
+    following = serializers.SlugRelatedField(
+        slug_field="email", many=True, read_only=True
+    )
 
     class Meta:
         model = UserProfile
@@ -44,8 +47,6 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
 
 
 class UserProfileListSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(source="user.id", read_only=True)
-
     class Meta:
         model = UserProfile
         fields = (
