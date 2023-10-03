@@ -19,7 +19,10 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         GET -> /posts/{id}/ -> return the post detail
     """
 
-    queryset = Post.objects.select_related("author")
+    queryset = Post.objects.select_related("author").prefetch_related(
+        "comments"
+    )
+
     serializer_class = PostSerializer
     permission_classes = (permissions.AllowAny,)
 
@@ -75,12 +78,14 @@ class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
     """
 
-    queryset = Comments.objects.prefetch_related("author", "post")
+    queryset = Comments.objects.select_related("author", "post")
     serializer_class = CommentSerializer
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        return Comments.objects.filter(post__id=self.kwargs["post_pk"])
+        return Comments.objects.filter(
+            post__id=self.kwargs["post_pk"]
+        ).select_related("post")
 
 
 class CommentCreateView(generics.CreateAPIView):

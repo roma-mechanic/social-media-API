@@ -9,6 +9,7 @@ from rest_framework_simplejwt.token_blacklist.models import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from user.models import User
 from user.serializers import (
     UserSerializer,
     UserDetailSerializer,

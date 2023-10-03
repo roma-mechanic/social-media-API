@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Count
 from django.utils.text import slugify
 
 from social_media_api import settings
@@ -48,19 +49,19 @@ class Post(models.Model):
     def __str__(self):
         return f"Post id = {self.id}, author = {self.author}"
 
-    @property
+    # @property
     def total_likes(self):
         return self.likes.count()
 
     def get_comments_count(self):
-        return self.comments.all().count()
+        return self.comments.count()
 
 
 class Comments(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="comment",
+        related_name="comments",
     )
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="comments"
@@ -72,6 +73,6 @@ class Comments(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-    @property
+    # @property
     def total_likes(self):
         return self.likes.count()

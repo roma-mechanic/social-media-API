@@ -14,7 +14,7 @@ class CommentSerializer(serializers.ModelSerializer):
     """
 
     author = UserListSerializer(read_only=True)
-    post = serializers.SlugRelatedField(slug_field="id", read_only=True)
+    # post = serializers.SlugRelatedField(slug_field="id", read_only=True)
     is_fan = serializers.SerializerMethodField()
 
     class Meta:

@@ -1,5 +1,7 @@
+from django.db.models import Count
 from rest_framework import serializers
 
+from posts.models import Post
 from user.models import User
 from user_profile.models import UserProfile
 
@@ -47,16 +49,25 @@ class UserProfileDetailSerializer(serializers.ModelSerializer):
 
 
 class UserProfileListSerializer(serializers.ModelSerializer):
+    count_posts = serializers.IntegerField(source="get_posts_count")
+
     class Meta:
         model = UserProfile
         fields = (
             "id",
             "user_id",
             "username",
+            "count_posts",
             "profile_image",
             "followers",
             "following",
         )
+
+    # def get_count_posts(self, request):
+    # user = request.user
+    # return Post.objects.select_related("author").filter(author__id=user.id).count()
+    # return User.objects.annotate(Count("posts"))
+    # return user.posts.count()
 
 
 class FanSerializer(serializers.ModelSerializer):

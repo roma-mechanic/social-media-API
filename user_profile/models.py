@@ -5,7 +5,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.text import slugify
 
+from posts.models import Post
 from social_media_api import settings
+from user.models import User
 
 USER = get_user_model()
 
@@ -36,3 +38,10 @@ class UserProfile(models.Model):
     following = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="following", blank=True
     )
+
+    def get_posts_count(self):
+        return (
+            Post.objects.select_related("author")
+            .filter(author=self.user)
+            .count()
+        )
