@@ -15,9 +15,9 @@ from user.models import User
 
 
 class TestLoginCase(APITestCase):
-    login_url = reverse("token_obtain_pair")
-    refresh_token_url = reverse("token_refresh")
-    logout_url = reverse("logout")
+    login_url = reverse("user:token_obtain_pair")
+    refresh_token_url = reverse("user:token_refresh")
+    logout_url = reverse("user:logout")
 
     email = "test@user.com"
     password = "kah2ie3urh4k"
