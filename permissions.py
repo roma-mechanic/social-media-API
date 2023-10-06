@@ -1,16 +1,17 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
+from user_profile.models import UserProfile
+
 
 class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
     def has_permission(self, request, view):
         return bool(
             (
-                    request.method in SAFE_METHODS
-                    and request.user
-                    and request.user.is_authenticated
+                request.method in SAFE_METHODS
+                and request.user
+                and request.user.is_authenticated
             )
             or (request.user and request.user.is_staff)
-
         )
 
 
@@ -24,4 +25,4 @@ class IsAuthorOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return obj.author == request.user
+        return obj.author == UserProfile.objects.get(user=request.user)

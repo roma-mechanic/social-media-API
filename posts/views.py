@@ -7,7 +7,13 @@ from rest_framework.generics import (
 from permissions import IsAuthorOrReadOnly
 from posts.mixin import LikedMixin
 from posts.models import Comments, Post
-from posts.serializers import CommentSerializer, PostSerializer
+from posts.serializers import (
+    CommentSerializer,
+    PostDetailSerializer,
+    PostListSerializer,
+    CommentDetailSerializer,
+)
+from user_profile.models import UserProfile
 
 
 class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
@@ -20,11 +26,16 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     """
 
     queryset = Post.objects.select_related("author").prefetch_related(
-        "comments"
+        "comments", "likes", "likes__user"
     )
 
-    serializer_class = PostSerializer
+    serializer_class = PostListSerializer
     permission_classes = (permissions.AllowAny,)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return PostDetailSerializer
+        return PostListSerializer
 
 
 class PostCreateView(generics.CreateAPIView):
@@ -37,11 +48,13 @@ class PostCreateView(generics.CreateAPIView):
     """
 
     queryset = Post.objects.select_related("author")
-    serializer_class = PostSerializer
+    serializer_class = PostDetailSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
-        return serializer.save(author=self.request.user)
+        return serializer.save(
+            author=UserProfile.objects.get(user=self.request.user)
+        )
 
 
 class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -56,11 +69,13 @@ class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     """
 
     queryset = Post.objects.select_related("author")
-    serializer_class = PostSerializer
+    serializer_class = PostDetailSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
-        return serializer.save(author=self.request.user)
+        return serializer.save(
+            author=UserProfile.objects.get(user=self.request.user)
+        )
 
 
 class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
@@ -78,27 +93,36 @@ class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
     """
 
-    queryset = Comments.objects.select_related("author", "post")
     serializer_class = CommentSerializer
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        return Comments.objects.filter(
-            post__id=self.kwargs["post_pk"]
-        ).select_related("post")
+        return (
+            Comments.objects.filter(post__id=self.kwargs["post_pk"])
+            .select_related("post", "author")
+            .prefetch_related("likes")
+        )
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return CommentDetailSerializer
+        return CommentSerializer
 
 
 class CommentCreateView(generics.CreateAPIView):
-    queryset = Comments.objects.prefetch_related("author", "post")
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return Comments.objects.filter(post__id=self.kwargs["post_pk"])
+        return Comments.objects.filter(
+            post__id=self.kwargs["post_pk"]
+        ).select_related("author", "post")
 
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs["post_pk"])
-        return serializer.save(author=self.request.user, post=post)
+        return serializer.save(
+            author=UserProfile.objects.get(user=self.request.user), post=post
+        )
 
 
 class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
@@ -129,7 +153,7 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
 class UserPostListAPIView(ListAPIView):
     """ """
 
-    serializer_class = PostSerializer
+    serializer_class = PostListSerializer
 
     def get_queryset(self):
         return Post.objects.filter(author__id=self.kwargs["pk"])

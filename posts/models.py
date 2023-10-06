@@ -7,10 +7,10 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models import Count
 from django.utils.text import slugify
 
 from social_media_api import settings
+from user_profile.models import UserProfile
 
 
 class Like(models.Model):
@@ -34,7 +34,7 @@ def movie_image_file_path(instance, filename):
 class Post(models.Model):
     title = models.CharField(max_length=63)
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        UserProfile,
         on_delete=models.CASCADE,
         related_name="posts",
     )
@@ -59,7 +59,7 @@ class Post(models.Model):
 
 class Comments(models.Model):
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+        UserProfile,
         on_delete=models.CASCADE,
         related_name="comments",
     )
