@@ -138,12 +138,19 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
          PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
     """
 
-    queryset = Comments.objects.prefetch_related("author", "post")
+    queryset = Comments.objects.select_related("author", "post")
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrReadOnly, permissions.IsAdminUser)
+    permission_classes = (
+        IsAuthorOrReadOnly,
+        permissions.IsAdminUser,
+    )
 
     def get_queryset(self):
-        return Comments.objects.filter(post__id=self.kwargs["post_pk"])
+        return (
+            Comments.objects.filter(post__id=self.kwargs["post_pk"])
+            .select_related("post", "author")
+            .prefetch_related("likes", "likes__user")
+        )
 
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs["post_pk"])
