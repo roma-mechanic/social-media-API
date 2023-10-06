@@ -15,31 +15,29 @@ from user.models import User
 
 
 class TestLoginCase(APITestCase):
+    login_url = reverse("token_obtain_pair")
+    refresh_token_url = reverse("token_refresh")
+    logout_url = reverse("logout")
 
-    login_url = reverse('token_obtain_pair')
-    refresh_token_url = reverse('token_refresh')
-    logout_url = reverse('logout')
-
-    email = 'test@user.com'
-    password = 'kah2ie3urh4k'
+    email = "test@user.com"
+    password = "kah2ie3urh4k"
 
     def setUp(self):
         self.user = User.objects.create_user(self.email, self.password)
 
     def _login(self):
-        data = {
-            'email': self.email, 'password': self.password
-        }
+        data = {"email": self.email, "password": self.password}
         r = self.client.post(self.login_url, data)
         body = r.json()
-        if 'access' in body:
+        if "access" in body:
             self.client.credentials(
-                HTTP_AUTHORIZATION='Bearer %s' % body['access'])
+                HTTP_AUTHORIZATION="Bearer %s" % body["access"]
+            )
         return r.status_code, body
 
     def test_logout_response_200(self):
         _, body = self._login()
-        data = {'refresh': body['refresh']}
+        data = {"refresh": body["refresh"]}
         r = self.client.post(self.logout_url, data)
         body = r.content
         self.assertEquals(r.status_code, 204, body)
@@ -47,7 +45,7 @@ class TestLoginCase(APITestCase):
 
     def test_logout_with_bad_refresh_token_response_400(self):
         self._login()
-        data = {'refresh': 'dsf.sdfsdf.sdf'}
+        data = {"refresh": "dsf.sdfsdf.sdf"}
         r = self.client.post(self.logout_url, data)
         body = r.json()
         self.assertEquals(r.status_code, 400, body)
@@ -56,7 +54,7 @@ class TestLoginCase(APITestCase):
     def test_logout_refresh_token_in_blacklist(self):
         _, body = self._login()
         r = self.client.post(self.logout_url, body)
-        token = partial(RefreshToken, body['refresh'])
+        token = partial(RefreshToken, body["refresh"])
         self.assertRaises(TokenError, token)
 
     def test_access_token_still_valid_after_logout(self):
@@ -72,7 +70,7 @@ class TestLoginCase(APITestCase):
         self.client.post(self.logout_url, body)
         m = mock.Mock()
         m.return_value = aware_utcnow() + timedelta(minutes=60)
-        with mock.patch('rest_framework_simplejwt.tokens.aware_utcnow', m):
+        with mock.patch("rest_framework_simplejwt.tokens.aware_utcnow", m):
             r = self.client.get(self.profile_url)
             body = r.json()
         self.assertEquals(r.status_code, 401, body)

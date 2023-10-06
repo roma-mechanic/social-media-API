@@ -1,3 +1,5 @@
+from django.shortcuts import redirect
+from django.urls import reverse
 from rest_framework import permissions
 from rest_framework import viewsets, generics
 from rest_framework.generics import (
@@ -163,4 +165,8 @@ class UserPostListAPIView(ListAPIView):
     serializer_class = PostListSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(author__id=self.kwargs["pk"])
+        return (
+            Post.objects.filter(author__id=self.kwargs["pk"])
+            .select_related("author")
+            .prefetch_related("comments", "likes")
+        )
