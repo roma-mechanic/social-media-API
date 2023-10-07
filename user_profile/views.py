@@ -58,7 +58,7 @@ def add_follower(request, pk, *args, **kwargs):
     other_profile = UserProfile.objects.get(pk=pk)
     other_user = other_profile.user
     if current_user == other_user:
-        raise ValidationError("You cun not follow yourself")
+        raise ValueError("You cun not follow yourself")
     other_profile.followers.add(current_user)
     current_profile.following.add(other_user)
     return redirect("user_profile:userprofile-detail", pk=other_profile.pk)

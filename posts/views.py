@@ -6,7 +6,7 @@ from rest_framework.generics import (
     ListAPIView,
 )
 
-from permissions import IsAuthorOrReadOnly
+from permissions import IsAuthorOrReadOnly, IsAdminOrIfAuthenticatedReadOnly
 from posts.mixin import LikedMixin
 from posts.models import Comments, Post
 from posts.serializers import (
@@ -72,7 +72,7 @@ class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.select_related("author")
     serializer_class = PostDetailSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, permissions.IsAdminUser)
 
     def perform_create(self, serializer):
         return serializer.save(

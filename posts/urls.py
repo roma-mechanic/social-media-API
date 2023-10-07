@@ -11,7 +11,7 @@ from posts.views import (
 )
 
 router = routers.SimpleRouter()
-router.register(r"posts", PostReadOnlyViewSet)
+router.register(r"posts", PostReadOnlyViewSet, basename="posts")
 
 comments_router = routers.NestedSimpleRouter(router, r"posts", lookup="post")
 comments_router.register(
