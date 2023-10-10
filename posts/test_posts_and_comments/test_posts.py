@@ -103,6 +103,49 @@ class UnauthenticatedPostApiTest(APITestCase):
         self.assertIn(serializer2.data, res.data)
         self.assertIn(serializer3.data, res.data)
 
+    def test_post_list_filter_by_title(self):
+        post1 = sample_post(title="starship", author=self.author)
+        post2 = sample_post(title="cars", author=self.author)
+        post3 = sample_post(title="submarine", author=self.author)
+
+        res = self.client.get(POST_URL, {"title": "submarine"})
+
+        serializer1 = PostListSerializer(post1)
+        serializer2 = PostListSerializer(post2)
+        serializer3 = PostListSerializer(post3)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertNotIn(serializer1.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)
+        self.assertIn(serializer3.data, res.data)
+
+    def test_post_list_filter_by_author(self):
+        user1 = get_user_model().objects.create_user(
+            email="Petro@email.com", password="petropassword"
+        )
+        user2 = get_user_model().objects.create_user(
+            email="Roman@mail.com", password="romanpassword"
+        )
+
+        author1 = UserProfile.objects.create(
+            user=user1, username="petro_username"
+        )
+        author2 = UserProfile.objects.create(
+            user=user2, username="roman_username"
+        )
+
+        post1 = sample_post(author=author1)
+        post2 = sample_post(author=author2)
+
+        serializer1 = PostListSerializer(post1)
+        serializer2 = PostListSerializer(post2)
+
+        res = self.client.get(POST_URL, {"author": "roman"})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer1.data, res.data)
+
     def test_get_post_detail_auth_optional(self):
         url = detail_url(self.post.id)
         res = self.client.get(url)
