@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import reverse
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import permissions
 from rest_framework import viewsets, generics
 from rest_framework.generics import (
@@ -39,7 +40,34 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
             return PostDetailSerializer
         return PostListSerializer
 
+    def get_queryset(self):
+        title = self.request.query_params.get("title")
+        author = self.request.query_params.get("author")
+        queryset = self.queryset
 
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+
+        if author:
+            queryset = queryset.filter(author__username__icontains=author)
+        return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="title",
+                type=str,
+                description="Filter by title (ex. ?title=Cars)",
+            ),
+            OpenApiParameter(
+                name="author",
+                type=str,
+                description="Filter by authors username  (ex: ?author=Bob)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class PostCreateView(generics.CreateAPIView):
@@ -74,7 +102,7 @@ class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.select_related("author")
     serializer_class = PostDetailSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = [IsAuthorOrReadOnly | permissions.IsAdminUser]
 
     def perform_create(self, serializer):
         return serializer.save(
