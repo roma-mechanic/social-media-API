@@ -40,6 +40,8 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         return PostListSerializer
 
 
+
+
 class PostCreateView(generics.CreateAPIView):
     """
     Create  new post. Must
@@ -72,7 +74,7 @@ class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Post.objects.select_related("author")
     serializer_class = PostDetailSerializer
-    permission_classes = (IsAuthorOrReadOnly, permissions.IsAdminUser)
+    permission_classes = (IsAuthorOrReadOnly,)
 
     def perform_create(self, serializer):
         return serializer.save(

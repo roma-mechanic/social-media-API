@@ -25,4 +25,7 @@ class IsAuthorOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return obj.author == UserProfile.objects.get(user=request.user)
+        return (
+            request.user.is_authenticated
+            and obj.author == request.user.profile
+        )
