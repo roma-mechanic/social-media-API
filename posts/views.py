@@ -129,11 +129,28 @@ class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
-        return (
+        queryset = (
             Comments.objects.filter(post__id=self.kwargs["post_pk"])
             .select_related("post", "author")
             .prefetch_related("likes")
         )
+
+        author = self.request.query_params.get("author")
+        if author:
+            queryset = queryset.filter(author__username__icontains=author)
+        return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="author",
+                type=str,
+                description="Filter by authors username  (ex: ?author=Bob)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == "retrieve":
