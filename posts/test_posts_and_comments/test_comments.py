@@ -182,3 +182,54 @@ class UnauthenticatedCommentApiTest(APITestCase):
         res = self.client.delete(url)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class AuthenticatedCommentsApiTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        user = get_user_model().objects.create_user(
+            email="test@email.com", password="password"
+        )
+        self.client.force_authenticate(user)
+        self.author = UserProfile.objects.create(
+            user=user, username="test username"
+        )
+        self.post = Post.objects.create(
+            title="test title", author=self.author, content="test content"
+        )
+
+    def test_create_comment_auth_required(self):
+        data = {
+            "author": self.author,
+            "post": self.post,
+            "content": "test content",
+        }
+        url = reverse("posts:comment-create", args=[self.post.id])
+        res = self.client.post(url, data)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    def test_update_post_auth_required(self):
+        old_comment = sample_comment(
+            author=self.author, post=self.post, content="old content"
+        )
+        data = {
+            "author": self.author,
+            "post": self.post,
+            "content": "new content",
+        }
+        url = reverse(
+            "posts:comment-update", args=[self.post.id, old_comment.id]
+        )
+        res = self.client.patch(url, data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_delete_post_auth_required(self):
+        old_comment = sample_comment(
+            author=self.author, post=self.post, content="old content"
+        )
+        url = reverse(
+            "posts:comment-update", args=[self.post.id, old_comment.id]
+        )
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

@@ -189,10 +189,7 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Comments.objects.select_related("author", "post")
     serializer_class = CommentSerializer
-    permission_classes = (
-        IsAuthorOrReadOnly,
-        permissions.IsAdminUser,
-    )
+    permission_classes = (IsAuthorOrReadOnly | permissions.IsAdminUser,)
 
     def get_queryset(self):
         return (
