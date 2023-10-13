@@ -1,9 +1,9 @@
-from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 
+from permissions import IsAuthorOrReadOnly
 from user_profile.models import UserProfile
 from user_profile.serializers import (
     UserProfileListSerializer,
@@ -17,7 +17,7 @@ class UserProfileListView(generics.ListAPIView):
         "followers", "following", "posts"
     )
     serializer_class = UserProfileListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated | permissions.IsAdminUser,)
 
 
 class UserProfileCreateView(generics.CreateAPIView):
@@ -34,7 +34,7 @@ class UserProfileDetailView(generics.RetrieveAPIView):
         "followers", "following", "posts"
     )
     serializer_class = UserProfileDetailSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated | permissions.IsAdminUser,)
 
 
 class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
@@ -42,7 +42,7 @@ class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
         "followers", "following"
     )
     serializer_class = UserProfileDetailSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated | permissions.IsAdminUser,)
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)

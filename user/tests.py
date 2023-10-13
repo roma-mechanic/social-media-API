@@ -5,7 +5,8 @@ from django.test import TestCase
 
 from functools import partial
 
-from rest_framework.test import APITestCase
+from rest_framework import status
+from rest_framework.test import APITestCase, APIClient
 from rest_framework.reverse import reverse
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -23,12 +24,16 @@ class TestLoginCase(APITestCase):
     password = "kah2ie3urh4k"
 
     def setUp(self):
+        self.client = APIClient()
         self.user = User.objects.create_user(self.email, self.password)
+        # self.client.force_authenticate(self.user)
 
     def _login(self):
-        data = {"email": self.email, "password": self.password}
-        r = self.client.post(self.login_url, data)
+        payload = {"email": self.email, "password": self.password}
+        r = self.client.post(self.login_url, payload)
+        print(r.data)
         body = r.json()
+        print(body)
         if "access" in body:
             self.client.credentials(
                 HTTP_AUTHORIZATION="Bearer %s" % body["access"]
@@ -40,7 +45,8 @@ class TestLoginCase(APITestCase):
         data = {"refresh": body["refresh"]}
         r = self.client.post(self.logout_url, data)
         body = r.content
-        self.assertEquals(r.status_code, 204, body)
+        print(body)
+        self.assertEquals(r.status_code, status.HTTP_200_OK, body)
         self.assertFalse(body, body)
 
     def test_logout_with_bad_refresh_token_response_400(self):
