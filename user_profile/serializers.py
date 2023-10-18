@@ -63,12 +63,6 @@ class UserProfileListSerializer(serializers.ModelSerializer):
             "following",
         )
 
-    # def get_count_posts(self, request):
-    # user = request.user
-    # return Post.objects.select_related("author").filter(author__id=user.id).count()
-    # return User.objects.annotate(Count("posts"))
-    # return user.posts.count()
-
 
 class FanSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()

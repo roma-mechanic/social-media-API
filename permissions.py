@@ -17,7 +17,8 @@ class IsAdminOrIfAuthenticatedReadOnly(BasePermission):
 
 class IsAuthorOrReadOnly(BasePermission):
     """
-    Checks that the authorised user is the owner of the resource when making non
+    Checks that the authorised user is the owner of the
+     resource when making non
     safe http requests.
     """
 

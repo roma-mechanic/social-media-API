@@ -1,4 +1,4 @@
-FROM python:3.10.12-slim
+FROM python:3.10-alpine3.17
 
 LABEL maintainer="roman.garmatiuk@gmail.com"
 
