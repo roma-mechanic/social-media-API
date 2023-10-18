@@ -44,8 +44,6 @@ class UnauthenticatedUserProfileAPITestCase(APITestCase):
         profile = sample_profile(user=self.user, username="old username")
         url = reverse("user_profile:userprofile-detail", args=[profile.id])
         res = self.client.get(url)
-        profiles = UserProfile.objects.get(user=self.user)
-        serializer = UserProfileDetailSerializer(profiles)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_profile_auth_required(self):
@@ -53,8 +51,6 @@ class UnauthenticatedUserProfileAPITestCase(APITestCase):
         url = reverse("user_profile:userprofile-update", args=[profile.id])
         payload = {"username": "new username"}
         res = self.client.patch(url, payload)
-        profiles = UserProfile.objects.get(user=self.user)
-        serializer = UserProfileDetailSerializer(profiles)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_profile_auth_required(self):

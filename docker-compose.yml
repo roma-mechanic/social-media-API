@@ -14,11 +14,8 @@ services:
             python manage.py migrate &&
             python manage.py runserver 0.0.0.0:8000"
 
-    environment:
-#      - POSTGRES_HOST=db
-#      - POSTGRES_DB=PlanetariumDB
-#      - POSTGRES_USER=startramp
-#      - POSTGRES_PASSWORD=Yfhvfnjr66
+    env_file:
+      - .env
 
     depends_on:
       - db
@@ -26,14 +23,11 @@ services:
 
 
   db:
-    image: postgres:15-alpine3.17
+    image: postgres:15.4-alpine3.18
     ports:
       - "5432:5432"
     restart: always
     #    volumes:
     #      - ./data/db:/var/lib/postgresql/data
-    environment:
-#      - POSTGRES_HOST=db
-#      - POSTGRES_DB=PlanetariumDB
-#      - POSTGRES_USER=startramp
-#      - POSTGRES_PASSWORD=Yfhvfnjr66
+    env_file:
+      - .env

@@ -93,10 +93,11 @@ class PostUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     """
     Allows user to delete their post. ID for the post required.
     Users can only delete their own posts. Also enable the retrieval
-        of a single post details.
+    of a single post details.
 
-        GET -> /posts/<id>/ -> return the post detail with the post ID
-        PUT, PATCH, DELETE -> /posts/<id>/update/ -> put, patch, delete post with post ID
+    GET -> /posts/<id>/ -> return the post detail with the post ID
+    PUT, PATCH, DELETE -> /posts/<id>/update/ -> put,
+     patch, delete post with post ID
 
     """
 
@@ -116,13 +117,14 @@ class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     be logged in to create comments on the post, add/remove like.
 
     EXAMPLE:
-        GET -> /posts/<post_id>/comments/ -> returns all comments for post with id
-        GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
-        POST -> /posts/<post_id>/comment/create/ -> create new comment on post with id
-        POST -> /posts/<post_id>/comments/<comment_id>/like/ -> add like to this comment
-        POST -> /posts/<post_id>/comments/<comment_id>/unlike/ -> remove like from this comment
+    GET -> /posts/<post_id>/comments/ -> returns all comments for post with id
+    GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
+    POST -> /posts/<post_id>/comment/create/ -> create new comment on post with id
+    POST -> /posts/<post_id>/comments/<comment_id>/like/ -> add like to this comment
+    POST -> /posts/<post_id>/comments/<comment_id>/unlike/ -> remove like from this comment
 
-        PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
+    PLEASE NOTE: the word “comment” is spelled differently
+    in different endpoints ("comment" and "comments")
     """
 
     serializer_class = CommentSerializer
@@ -176,15 +178,18 @@ class CommentCreateView(generics.CreateAPIView):
 
 class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
     """
-     Allows user to delete, update their comment on a post. ID for the post and comment
-     required. Users can only delete their own comments. Also enable the retrieval
-     of a single comments details.
+     Allows user to delete, update their comment on a post.
+      ID for the post and comment required.
+        Users can only delete their own comments.
+        Also enable the retrieval of a single comments details.
 
     EXAMPLE:
-        GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
-        PUT, PATCH, DELETE -> /posts/<post_id>/comments/<comment_id>/update/ -> update, delete comment
 
-         PLEASE NOTE: the word “comment” is spelled differently in different endpoints ("comment" and "comments")
+    GET -> /posts/<post_id>/comments/<comment_id>/ -> comment details
+    PUT, PATCH, DELETE -> /posts/<post_id>/comments/<comment_id>/update/ -> update, delete comment
+
+    PLEASE NOTE: the word “comment” is spelled differently
+     in different endpoints ("comment" and "comments")
     """
 
     queryset = Comments.objects.select_related("author", "post")
