@@ -102,6 +102,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "date_created",
             "is_fan",
             "total_likes",
+            "is_publish",
         ]
         read_only_fields = [
             "id",
