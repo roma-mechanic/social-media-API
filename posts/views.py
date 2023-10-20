@@ -28,7 +28,7 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         GET -> /posts/{id}/ -> return the post detail
     """
 
-    queryset = Post.objects.select_related("author").prefetch_related(
+    queryset = Post.objects.filter(is_publish=True).select_related("author").prefetch_related(
         "comments", "likes", "likes__user"
     )
 
@@ -43,6 +43,7 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
     def get_queryset(self):
         title = self.request.query_params.get("title")
         author = self.request.query_params.get("author")
+
         queryset = self.queryset
 
         if title:
@@ -82,6 +83,8 @@ class PostCreateView(generics.CreateAPIView):
     queryset = Post.objects.select_related("author")
     serializer_class = PostDetailSerializer
     permission_classes = (permissions.IsAuthenticated,)
+
+
 
     def perform_create(self, serializer):
         return serializer.save(
