@@ -42,6 +42,7 @@ class Post(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, upload_to=movie_image_file_path)
     likes = GenericRelation(Like)
+    is_publish = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-date_created"]
