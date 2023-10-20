@@ -28,8 +28,10 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
         GET -> /posts/{id}/ -> return the post detail
     """
 
-    queryset = Post.objects.filter(is_publish=True).select_related("author").prefetch_related(
-        "comments", "likes", "likes__user"
+    queryset = (
+        Post.objects.filter(is_publish=True)
+        .select_related("author")
+        .prefetch_related("comments", "likes", "likes__user")
     )
 
     serializer_class = PostListSerializer
@@ -83,8 +85,6 @@ class PostCreateView(generics.CreateAPIView):
     queryset = Post.objects.select_related("author")
     serializer_class = PostDetailSerializer
     permission_classes = (permissions.IsAuthenticated,)
-
-
 
     def perform_create(self, serializer):
         return serializer.save(
