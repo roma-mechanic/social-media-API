@@ -13,7 +13,7 @@ USER = get_user_model()
 
 def movie_image_file_path(instance, filename):
     _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.email)}-{uuid.uuid4()}{extension}"
+    filename = f"{slugify(instance.username)}-{uuid.uuid4()}{extension}"
 
     return os.path.join("uploads/user", filename)
 
