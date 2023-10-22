@@ -11,6 +11,7 @@ services:
 
     command: >
       sh -c "python manage.py wait_for_db &&
+            python manage.py makemigrations &&
             python manage.py migrate &&
             python manage.py runserver 0.0.0.0:8000"
 
@@ -27,7 +28,55 @@ services:
     ports:
       - "5432:5432"
     restart: always
-#        volumes:
-#          - ./data/db:/var/lib/postgresql/data
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
     env_file:
       - .env
+
+
+  redis:
+    image: "redis:alpine"
+
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      sh -c "python manage.py wait_for_db &&
+      celery -A social_media_api worker -l info"
+    depends_on:
+      - app
+      - redis
+      - db
+    restart: on-failure
+    env_file:
+      - .env
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      sh -c "python manage.py wait_for_db &&
+      celery -A social_media_api beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    depends_on:
+      - app
+      - redis
+      - db
+    restart: on-failure
+    env_file:
+      - .env
+
+#  flower:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "5555:5555"
+#    command: "celery -A social_media_api flower --address=0.0.0.0"
+#    depends_on:
+#      - celery
+#    env_file:
+#      - .env
+
