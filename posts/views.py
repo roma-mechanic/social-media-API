@@ -7,6 +7,7 @@ from rest_framework.generics import (
     ListAPIView,
 )
 
+from pagination import ListPagination
 from permissions import IsAuthorOrReadOnly, IsAdminOrIfAuthenticatedReadOnly
 from posts.mixin import LikedMixin
 from posts.models import Comments, Post
@@ -36,6 +37,7 @@ class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
 
     serializer_class = PostListSerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = ListPagination
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -132,6 +134,7 @@ class CommentsReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
 
     serializer_class = CommentSerializer
     permission_classes = (permissions.AllowAny,)
+    pagination_class = ListPagination
 
     def get_queryset(self):
         queryset = (
