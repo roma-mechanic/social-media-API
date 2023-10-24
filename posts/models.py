@@ -50,7 +50,6 @@ class Post(models.Model):
     def __str__(self):
         return f"Post id = {self.id}, author = {self.author}"
 
-    # @property
     def total_likes(self):
         return self.likes.count()
 
@@ -74,6 +73,5 @@ class Comments(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-    # @property
     def total_likes(self):
         return self.likes.count()

@@ -3,7 +3,6 @@ from rest_framework import generics, permissions
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 
-from permissions import IsAuthorOrReadOnly
 from user_profile.models import UserProfile
 from user_profile.serializers import (
     UserProfileListSerializer,
@@ -58,7 +57,7 @@ def add_follower(request, pk, *args, **kwargs):
     other_profile = UserProfile.objects.get(pk=pk)
     other_user = other_profile.user
     if current_user == other_user:
-        raise ValueError("You cun not follow yourself")
+        raise ValueError("You can not follow yourself")
     other_profile.followers.add(current_user)
     current_profile.following.add(other_user)
     return redirect("user_profile:userprofile-detail", pk=other_profile.pk)

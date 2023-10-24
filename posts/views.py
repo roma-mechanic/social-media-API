@@ -1,14 +1,9 @@
-from django.shortcuts import redirect
-from django.urls import reverse
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import permissions
 from rest_framework import viewsets, generics
-from rest_framework.generics import (
-    ListAPIView,
-)
 
 from pagination import ListPagination
-from permissions import IsAuthorOrReadOnly, IsAdminOrIfAuthenticatedReadOnly
+from permissions import IsAuthorOrReadOnly
 from posts.mixin import LikedMixin
 from posts.models import Comments, Post
 from posts.serializers import (
@@ -214,14 +209,4 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
         return serializer.save(author=self.request.user, post=post)
 
 
-class UserPostListAPIView(ListAPIView):
-    """ """
 
-    serializer_class = PostListSerializer
-
-    def get_queryset(self):
-        return (
-            Post.objects.filter(author__id=self.kwargs["pk"])
-            .select_related("author")
-            .prefetch_related("comments", "likes")
-        )

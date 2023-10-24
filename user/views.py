@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,8 @@ from rest_framework_simplejwt.token_blacklist.models import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from posts.models import Post
+from posts.serializers import PostListSerializer
 from user.models import User
 from user.serializers import (
     UserSerializer,
@@ -49,3 +52,16 @@ class APILogoutView(APIView):
         token = RefreshToken(token=refresh_token)
         token.blacklist()
         return Response({"status": "OK, goodbye"})
+
+
+class UserPostListAPIView(ListAPIView):
+    """Search for all posts by a given author by his UserProfile ID"""
+
+    serializer_class = PostListSerializer
+
+    def get_queryset(self):
+        return (
+            Post.objects.filter(author__id=self.kwargs["pk"])
+            .select_related("author")
+            .prefetch_related("comments", "likes")
+        )
