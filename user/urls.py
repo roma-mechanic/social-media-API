@@ -5,8 +5,12 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from posts.views import UserPostListAPIView
-from user.views import CreateUserView, ManageUserView, APILogoutView
+from user.views import (
+    CreateUserView,
+    ManageUserView,
+    APILogoutView,
+    UserPostListAPIView,
+)
 
 app_name = "user"
 

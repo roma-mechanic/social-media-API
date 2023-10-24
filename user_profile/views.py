@@ -1,4 +1,5 @@
 from django.shortcuts import redirect
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -17,6 +18,36 @@ class UserProfileListView(generics.ListAPIView):
     )
     serializer_class = UserProfileListSerializer
     permission_classes = (IsAuthenticated | permissions.IsAdminUser,)
+
+    def get_queryset(self):
+        user = self.request.query_params.get("user")
+        username = self.request.query_params.get("username")
+
+        queryset = self.queryset
+
+        if user:
+            queryset = queryset.filter(user__email__icontains=user)
+
+        if username:
+            queryset = queryset.filter(username__icontains=username)
+        return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user",
+                type=str,
+                description="Search user by email (ex. ?user=user@test.com)",
+            ),
+            OpenApiParameter(
+                name="username",
+                type=str,
+                description="Search user by username  (ex: ?username=Bob)",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class UserProfileCreateView(generics.CreateAPIView):
