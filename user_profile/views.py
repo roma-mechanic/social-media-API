@@ -82,9 +82,7 @@ class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(["POST"])
-@permission_classes(
-    IsAuthenticated,
-)
+@permission_classes([IsAuthenticated])
 def add_follower(request, pk, *args, **kwargs):
     current_profile = UserProfile.objects.get(user=request.user)
     current_user = request.user
@@ -98,9 +96,7 @@ def add_follower(request, pk, *args, **kwargs):
 
 
 @api_view(["POST"])
-@permission_classes(
-    IsAuthenticated,
-)
+@permission_classes([IsAuthenticated])
 def remove_follower(request, pk, *args, **kwargs):
     current_profile = UserProfile.objects.get(user=request.user)
     current_user = request.user
