@@ -12,7 +12,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from posts.models import Post
 from posts.serializers import PostListSerializer
-from user.models import User
 from user.serializers import (
     UserSerializer,
     UserDetailSerializer,
