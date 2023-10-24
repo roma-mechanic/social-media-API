@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from rest_framework import generics, permissions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from user_profile.models import UserProfile
@@ -51,6 +51,9 @@ class UserProfileUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(["POST"])
+@permission_classes(
+    IsAuthenticated,
+)
 def add_follower(request, pk, *args, **kwargs):
     current_profile = UserProfile.objects.get(user=request.user)
     current_user = request.user
@@ -64,6 +67,9 @@ def add_follower(request, pk, *args, **kwargs):
 
 
 @api_view(["POST"])
+@permission_classes(
+    IsAuthenticated,
+)
 def remove_follower(request, pk, *args, **kwargs):
     current_profile = UserProfile.objects.get(user=request.user)
     current_user = request.user
