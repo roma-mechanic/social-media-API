@@ -41,7 +41,7 @@ class Post(models.Model):
     content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, upload_to=movie_image_file_path)
-    likes = GenericRelation(Like)
+    likes = GenericRelation(Like, default=0)
     is_publish = models.BooleanField(default=True)
 
     class Meta:
@@ -50,10 +50,10 @@ class Post(models.Model):
     def __str__(self):
         return f"Post id = {self.id}, author = {self.author}"
 
-    def total_likes(self):
+    def total_likes(self) -> int:
         return self.likes.count()
 
-    def get_comments_count(self):
+    def get_comments_count(self) -> int:
         return self.comments.count()
 
 
@@ -68,10 +68,10 @@ class Comments(models.Model):
     )
     content = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
-    likes = GenericRelation(Like)
+    likes = GenericRelation(Like, default=0)
 
     class Meta:
         ordering = ["-created_at"]
 
-    def total_likes(self):
+    def total_likes(self) -> int:
         return self.likes.count()

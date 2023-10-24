@@ -207,6 +207,3 @@ class CommentUpdateView(generics.RetrieveUpdateDestroyAPIView):
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs["post_pk"])
         return serializer.save(author=self.request.user, post=post)
-
-
-
