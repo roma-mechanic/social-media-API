@@ -10,6 +10,12 @@ from user.views import (
     ManageUserView,
     APILogoutView,
     UserPostListAPIView,
+    UserProfileListView,
+    UserProfileCreateView,
+    UserProfileDetailView,
+    UserProfileUpdateDeleteView,
+    add_follower,
+    remove_follower,
 )
 
 app_name = "user"
@@ -22,4 +28,34 @@ urlpatterns = [
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("me/", ManageUserView.as_view(), name="manage"),
     path("<int:pk>/posts/", UserPostListAPIView.as_view(), name="user-posts"),
+    path(
+        "user_profile/",
+        UserProfileListView.as_view(),
+        name="userprofile-list",
+    ),
+    path(
+        "user_profile/create/",
+        UserProfileCreateView.as_view(),
+        name="userprofile-create",
+    ),
+    path(
+        "user_profile/<int:pk>/",
+        UserProfileDetailView.as_view(),
+        name="userprofile-detail",
+    ),
+    path(
+        "user_profile/<int:pk>/update/",
+        UserProfileUpdateDeleteView.as_view(),
+        name="userprofile-update",
+    ),
+    path(
+        "user_profile/<int:pk>/followers-add/",
+        add_follower,
+        name="follower-add",
+    ),
+    path(
+        "user_profile/<int:pk>/followers-remove/",
+        remove_follower,
+        name="-follower-remove",
+    ),
 ]

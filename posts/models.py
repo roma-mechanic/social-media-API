@@ -10,7 +10,7 @@ from django.db import models
 from django.utils.text import slugify
 
 from social_media_api import settings
-from user_profile.models import UserProfile
+from user.models import UserProfile
 
 
 class Like(models.Model):

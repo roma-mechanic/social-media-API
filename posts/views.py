@@ -12,7 +12,7 @@ from posts.serializers import (
     PostListSerializer,
     CommentDetailSerializer,
 )
-from user_profile.models import UserProfile
+from user.models import UserProfile
 
 
 class PostReadOnlyViewSet(viewsets.ReadOnlyModelViewSet, LikedMixin):
